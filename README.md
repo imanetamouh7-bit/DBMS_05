@@ -249,7 +249,8 @@ sqlite3 bibliothek.db ".schema"
 > **Screenshot 2:** Take a screenshot showing the `.tables` and `.schema`
 > output in your terminal.
 >
-> `[insert screenshot]`
+![screenshot 2](screenshot2.png)
+![screenshot 2a](screenshot2a.png)
 
 ### Task 2c – Test Constraints
 
