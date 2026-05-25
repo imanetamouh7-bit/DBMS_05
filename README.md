@@ -572,7 +572,7 @@ SELECT * FROM ausleihe WHERE ausleihe_id = 5;
 
 > **Screenshot 3:** Take a screenshot showing the inserted row.
 >
-> `[insert screenshot]`
+![screenshot 3](screenshot3.png)
 
 ### Task 5b – Simulate a Rollback
 
