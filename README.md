@@ -108,24 +108,24 @@ data type and write it into the table below. Justify each choice in one sentence
 Use `NUMERIC(p,s)` for monetary values; choose the most precise date/time type
 for each temporal attribute.
 
-| Attribute              | Your Type         | Justification |
-|------------------------|-------------------|---------------|
-| isbn                   |                   |               |
-| titel                  |                   |               |
-| erscheinungsjahr       |                   |               |
-| verlag                 |                   |               |
-| tagesgebuehr           |                   |               |
-| exemplar_id            |                   |               |
-| standort               |                   |               |
-| mitglied_id            |                   |               |
-| nachname               |                   |               |
-| vorname                |                   |               |
-| geburtsdatum           |                   |               |
-| email                  |                   |               |
-| beitritt_datum         |                   |               |
-| ausleihe_id            |                   |               |
-| ausleihe_datum         |                   |               |
-| rueckgabe_datum        |                   |               |
+| Attribute              | Your Type         | Justification                                                   |
+|------------------------|-------------------|-----------------------------------------------------------------|
+| isbn                   | TEXT              |ISBNs contain hyphens and are not used for arithmetic operations.|
+| titel                  | TEXT              | Book titles are textual data with variable length.              |
+| erscheinungsjahr       | INTEGER           |A publication year is a whole number without decimals.           |
+| verlag                 | TEXT              |Publisher names are textual values.                              |
+| tagesgebuehr           | NUMERIC(5,2)      | Monetary values require exact decimal precision.                |
+| exemplar_id            | INTEGER           |Copy IDs are numeric identifiers.                                |
+| standort               | TEXT              |Shelf locations contain letters and symbols                      |
+| mitglied_id            | INTEGER           |Member IDs are numeric identifiers.                              |
+| nachname               | TEXT              |Last names are textual data                                      |
+| vorname                | TEXT              |First names are textual data                                     |
+| geburtsdatum           | DATE              |Birth dates should store only calendar dates                     |
+| email                  | TEXT              |E-mail addresses are textual values                              |
+| beitritt_datum         | DATE              | The membership date stores a calendar date                      |
+| ausleihe_id            | INTEGER           | Loan IDs are numeric identifiers                                |
+| ausleihe_datum         | DATE              |The loan date stores a calendar date                             |
+| rueckgabe_datum        | DATE             | The return date stores a calendar date and may be NULL          |
 
 ### Questions for Task 1
 
@@ -133,19 +133,26 @@ for each temporal attribute.
 example — using arithmetic — of why `REAL` would produce an incorrect result
 for a lending fee calculation. Which type must be used instead?
 
-> *Your answer:*
+REAL can produce rounding errors because floating-point arithmetic is not exact. 
+For example, 0.10 + 0.20 may result in 0.30000000000000004 instead of exactly 0.30. 
+In a lending fee calculation, repeated calculations could therefore produce incorrect monetary totals. 
+NUMERIC(p,s) must be used instead because it stores decimal values exactly.
 
 **Question 1.2:** `rueckgabe_datum` must be nullable. Explain what `NULL` means
 in this specific context. Is `NULL` the same as "zero days"? Justify with
 reference to the three-valued logic of SQL.
 
-> *Your answer:*
+NULL in rueckgabe_datum means that the book has not yet been returned. 
+It is not the same as “zero days” because zero is a concrete numeric value, while NULL represents an unknown or missing value. 
+In SQL’s three-valued logic, comparisons involving NULL evaluate to UNKNOWN rather than TRUE or FALSE.
 
 **Question 1.3:** `beitritt_datum` should default to today's date when no value
 is provided. Write the `DEFAULT` expression you would use and explain why this
 is preferable to always supplying the date explicitly in the application.
 
-> *Your answer:*
+DEFAULT CURRENT_DATE
+Using DEFAULT CURRENT_DATE ensures that the current date is inserted automatically when no value is provided. 
+This reduces application errors, guarantees consistent data, and avoids having to supply the date manually in every INSERT statement.
 
 ---
 
