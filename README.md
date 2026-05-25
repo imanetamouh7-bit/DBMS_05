@@ -596,8 +596,8 @@ Verify that neither change persisted:
 SELECT rueckgabe_datum FROM ausleihe WHERE ausleihe_id = 2;
 SELECT COUNT(*) FROM ausleihe WHERE ausleihe_id = 6;
 ```
-
-> *Describe what you see and explain why `ROLLBACK` reversed both changes:*
+ROLLBACK reverted both changes because the entire transaction was canceled before COMMIT. 
+The UPDATE restoring the open loan state and the INSERT creating loan 6 were both undone, so the database returned to its previous consistent state.
 
 ### Questions for Task 5
 
@@ -605,20 +605,30 @@ SELECT COUNT(*) FROM ausleihe WHERE ausleihe_id = 6;
 availability check and the insert happen inside the same transaction?
 What could go wrong if they ran as separate Autocommit statements?
 
-> *Your answer:*
+The availability check and the INSERT must happen inside the same transaction to guarantee consistency. 
+If they were executed as separate autocommit statements, another user could borrow the same exemplar between the check and the INSERT. 
+This race condition could result in the same copy being loaned to multiple members simultaneously.
 
 **Question 5.2:** The lecture states: "Ein fehlendes `WHERE` aktualisiert
 alle Zeilen." Write the single most dangerous `UPDATE` statement possible
 on this database and explain the damage it would cause. Then explain how
 `BEGIN` / `ROLLBACK` would allow you to recover.
 
-> *Your answer:*
+A very dangerous UPDATE statement would be:
+UPDATE ausleihe
+SET rueckgabe_datum = NULL;
+Without a WHERE clause, this statement would reopen all loans in the database and make every book appear as currently borrowed. 
+This would corrupt the lending state of the entire library system. 
+Using BEGIN and ROLLBACK would allow recovery because the transaction could be canceled before COMMIT, restoring all original values.
 
 **Question 5.3:** Autocommit is convenient for read-only queries (`SELECT`).
 Is it also safe for DML in an interactive session? Give a concrete example
 from this exercise where Autocommit would have caused irreversible data loss.
 
-> *Your answer:*
+Autocommit is safe for read-only SELECT queries because they do not modify the database. 
+For DML statements such as INSERT, UPDATE, or DELETE, autocommit can be dangerous in an interactive session because mistakes are written permanently immediately after execution. 
+For example, in Task 3c a DELETE without the correct WHERE clause could have removed all loan records permanently. 
+Without BEGIN and ROLLBACK, the accidental data loss would not be reversible.
 
 Commit:
 
