@@ -647,7 +647,12 @@ The lecture warns against using `TEXT` for everything. Looking at the
 it should be a more specific type, and what concrete query would break or
 produce wrong results if the wrong type were used?
 
-> *Your answer:*
+The most tempting column to store as TEXT would be tagesgebuehr because monetary values often look like normal strings. 
+However, storing it as TEXT would break numeric calculations and comparisons. 
+For example, the query:
+SELECT * FROM buch
+WHERE tagesgebuehr > 0.50;
+could produce incorrect results because TEXT comparisons are lexicographical rather than numeric.
 
 **Question B – DDL as documentation:**  
 A colleague reads your `schema.sql` and says: "Constraints slow down inserts
@@ -655,14 +660,17 @@ A colleague reads your `schema.sql` and says: "Constraints slow down inserts
 reasons why enforcing constraints in the database is preferable to
 enforcing them only in application code.
 
-> *Your answer:*
+Database constraints guarantee data integrity independently of the application code, so invalid data cannot be inserted even if the application contains bugs or multiple applications access the same database. 
+Constraints also serve as formal documentation of the schema because rules such as UNIQUE, NOT NULL, CHECK, and FOREIGN KEY are directly visible in the DDL and consistently enforced by the database engine.
 
 **Question C – NULL semantics in lending:**  
 In `ausleihe`, `rueckgabe_datum IS NULL` means "currently on loan". Could
 this semantic be expressed without using `NULL` — e.g. by using a status
 column instead? What are the trade-offs?
 
-> *Your answer:*
+Yes, the semantic could also be represented with a separate status column such as 'borrowed' or 'returned'. 
+However, this introduces redundancy because the status and rueckgabe_datum could contradict each other. 
+Using NULL in rueckgabe_datum avoids duplicated information and directly expresses that the return date is currently unknown.
 
 **Question D – `TRUNCATE` vs. `DELETE`:**  
 If you wanted to reset the entire database and reload the sample data from
@@ -670,7 +678,14 @@ scratch, you would need to empty all four tables. Can you use `TRUNCATE`
 in SQLite? What alternative would you use, and in what order must the tables
 be emptied to respect foreign key constraints?
 
-> *Your answer:*
+SQLite does not support the TRUNCATE statement. 
+Instead, DELETE FROM must be used to empty the tables. 
+To respect foreign key constraints, the tables should be emptied in dependency order:
+1. ausleihe
+2. exemplar
+3. mitglied
+4. buch
+This order ensures that child rows are removed before parent rows referenced by foreign keys.
 
 > **Screenshot 4:** Take a screenshot showing the output of the row-count
 > verification from Task 3a after completing all DML tasks, with
