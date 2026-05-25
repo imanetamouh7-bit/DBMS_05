@@ -691,7 +691,7 @@ This order ensures that child rows are removed before parent rows referenced by 
 > verification from Task 3a after completing all DML tasks, with
 > `.headers on` and `.mode column` active.
 >
-![screenshot 4](screenshot4.png)
+![screenshot 4a](screenshot4a.png)
 
 ---
 
